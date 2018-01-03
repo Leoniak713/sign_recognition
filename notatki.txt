@@ -1,0 +1,7 @@
+Plany:
+Algorytm do ciecia nadgarstkow:
+1)Wyszukujemy linie proste
+2)Wyszukujemy pary rownolegle
+3)Znajdujemy najgrubsza i wystarczajaco dluga
+4)Ucinamy koniec od strony dloni
+

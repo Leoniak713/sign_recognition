@@ -6,65 +6,80 @@ function [ C ] = clust( RT, tolerance_width)
     
     for r = RT
         
-        %jesteœmy u góry przedzia³u
-        if r > (180 - tolerance_width)
-            if (r > (level_min + tolerance_width)) || (r > (level_max - tolerance_width + 180))
+        %jesteï¿½my u gï¿½ry przedziaï¿½u
+        if r > (180 - tolerance_width) %sprawdzamy czy jest w przedziale
+            if (r < (level_min + tolerance_width)) || (r > (level_max - tolerance_width + 180))
+                %punkt jest ponad minimum o mniej niz TW lub pod maximum o mniej niz TW
+                level = [level, r]; %dodajemy do levelu
+                if r < level_min %jesli jest nizszy od minimum
+                    level_min = r; %zmieniamy minimum
+                elseif (r > level_max) && (level_max > tolerance_width) 
+                    %jesli jest wyzszy od maximum, a to nie moze byc przewiniete
+                    level_max = r; %zmieniamy maximum
+                end
+            else %jesli wyszlismy poza przedzial
+                [level, level_min, level_max, C] = clust_level(level, level_min, level_max, C, tolerance_width, r); %wrzucamy rzeczy do clusta
+            end
+            
+        %jesteï¿½my z doï¿½u przedziaï¿½u
+        elseif r < tolerance_width %sprawdzamy czy jest w przedziale
+            if (r < (level_min + tolerance_width - 180)) || (r > (level_max - tolerance_width))
+                %punkt jest ponad minimum o mniej niz TW lub pod maximum o mniej niz TW
+                level = [level, r];
+                if (r < level_min) && (level_min <  180 - tolerance_width) 
+                    %jesli jest nizszy od minimum, a to nie moze byc przewiniete
+                    level_min = r;
+                elseif r > level_max
+                    level_max = r;
+                end
+            else
+                [level, level_min, level_max, C] = clust_level(level, level_min, level_max, C, tolerance_width, r);
+            end
+            
+        %jesteï¿½my we ï¿½rodku przedziaï¿½u
+        else
+            if (r < (level_min + tolerance_width)) && (r > (level_max - tolerance_width))
                 level = [level, r];
                 if r < level_min
                     level_min = r;
                 elseif r > level_max
                     level_max = r;
                 end
-            end
-            
-        %jesteœmy z do³u przedzia³u
-        elseif r < tolerance_width
-            if (r < (level_min + tolerance_width - 180)) || (r > (level_max - tolerance_width))
-                level = [level, r];
-                if r < level_min;
-                    level_min = r;
-                elseif r > level_max;
-                    level_max = r;
-                end
-            end
-            
-        %jesteœmy we œrudku przedzia³u
-        elseif (r < (level_min + tolerance_width)) && (r > (level_max - tolerance_width))
-            level = [level, r];
-            if r < level_min
-                level_min = r;
-            elseif r > level_max
-                level_max = r;
-            end
-                
-        %punkt wyszed³ poza tolerancjê
-        else
-            level_sum = 0;
-            if (level(1) > (180 - tolerance_width)) || (level(1) < tolerance_width)
-                for l = level
-                    level_sum = level_sum + l;
-                    if l < tolerance_width
-                        level_sum = level_sum + 180;
-                    end
-                end
-                level_mean = level_sum / length(level);
-                if level_mean > 180
-                    level_mean = level_mean - 180;
-                end
             else
-                level_mean = mean(level);
+                [level, level_min, level_max, C] = clust_level(level, level_min, level_max, C, tolerance_width, r);
             end
-            
-            level = ones(size(level)) * level_mean;
-            C = [C, level];
-            level = r;
-            level_min = r;
-            level_max = r;
+        %punkt wyszedï¿½ poza tolerancjï¿½
         end
-        
     end
     
-    level = ones(size(level)) * mean(level);
-    C = [C, level];
+    %[~, ~, ~, C] = clust_level(level, level_min, level_max, C, tolerance_width, 0);
+
 end
 
+function [level, level_min, level_max, C] = clust_level(level, level_min, level_max, C, tolerance_width, r)
+
+level_sum = 0;
+%jesli min i max sa przewiniete
+if (level_min > (180 - tolerance_width)) || (level_max < tolerance_width)
+    for l = level
+        level_sum = level_sum + l;
+        if l < tolerance_width
+            level_sum = level_sum + 180;
+        end
+    end
+    level_mean = level_sum / length(level);
+    if level_mean > 180
+        level_mean = level_mean - 180;
+    end
+%jesli min i max nie sa przewiniete
+else
+    level_mean = mean(level);
+end
+
+level = ones(size(level)) * level_mean;
+C = [C, level];
+level = r;
+level_min = r;
+level_max = r;
+
+end

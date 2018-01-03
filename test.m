@@ -1,10 +1,5 @@
-function [e] = test()
-
-    d = 0;
-    for i = 1:10
-        d = d + i;
-    end
-    e = d;
+function [e, f] = test(e, f)
+    f = f + 4;
+    e = e + 5;
 
 end
-

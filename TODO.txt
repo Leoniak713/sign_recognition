@@ -1,0 +1,3 @@
+1) (60 min) Porownac wygladzanie NStepDer'em, SmoothedNStepDer'em i Moving Mean'em
+2) (90 min) Znalezc optymalne rozchylenie prostych i ich wymagana dlugosc.
+3) (40 min) Pokminic klastrowanie z usrednianiem wysokich czestotliwosci
